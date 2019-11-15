@@ -4,6 +4,7 @@ double frand_a_b(double a, double b){
 }
 
 /* Fonction récursive qui a partir d'un processus pere commun, créé des fils */
+
 void newProcess(void)
 {
   float f = frand_a_b(0.2,3.0); /*Temps de latence aléatoire dans la création de processus */
@@ -43,6 +44,9 @@ void generateurProcessus()
         processus.pid = getpid();
         processus.tempsExec = rand()%(16+0);
         processus.dateSoumission = 0;
+
+        printf("\n");
+
         printf("    [* P1 *] NEW PROCESSUS [Priorité: %ld - PID: %d - TempsExec:%d ] \n", processus.priorite , processus.pid, processus.tempsExec ); //PPID COMMUN A TOUS LES PROCESSUS
 
         while(1){

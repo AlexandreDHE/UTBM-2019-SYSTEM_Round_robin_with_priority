@@ -7,16 +7,27 @@
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include "exec.h"
+#include "structProcessus.h"
 #include "generateurProcessus.h"
+#include "creationFilesDeMessage.h"
 
-int main(void)
+int main(int argc, char *argv[])
 {
     printf("*********************************************************************\n");
     printf("Simulation de ROUND ROBIN AVEC PRIORITÉ - [PID:%d - PPID:%d] \n", getpid(), getppid() );
     printf("*********************************************************************\n");
 
     printf("\n");
+
+    /********************************************/
+    /* Creation des 11 files de message 				*/
+    /********************************************/
+
+    printf("        [0] CREATION DES 11 FILES DE MESSAGES: OK. \n\n");
+    creationFilesDeMessage();
+
+    /* **************************************** */
+
 
     int retour = fork();
 
