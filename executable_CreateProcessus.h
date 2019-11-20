@@ -18,13 +18,17 @@ void createProcessus(int nombreProcessus){
             proc.dateSoumission = dateSoumission ; 
             proc.pid = getpid();
 
-            //printf("                    [2] new processus ( Priorité = %ld       TempsExec = %d       DateSoumission = %d)      [PID: %d]   -- ", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid);
+            printf("                              [2] new processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid );
+
             pushInFile(proc);
-            sleep(0.01);
+            ecritureProcessusGeneres(fichier, proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid);
+            
+            // p(0) ou v(0) -> SEMAPHORES
             
             while(1){sleep(10);}
 
         }else{
+            sleep(0.2);
             createProcessus(nombreProcessus);
         }
     }

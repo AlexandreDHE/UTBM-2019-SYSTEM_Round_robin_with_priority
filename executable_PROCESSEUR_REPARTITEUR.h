@@ -2,24 +2,20 @@ void work_processeur(){
 
 }
 
-processus repartiteur_want_processus(int priorite, processus proc){
+void repartiteur_want_processus(int priorite, processus proc){
 
-int longMSG;
+    int longMSG;
 
-  if(priorite == 1 ){
-    if ((longMSG = msgrcv(global_file, &proc, sizeof(processus) - 4, 1, IPC_NOWAIT)) == -1) {
-	  perror("Erreur de lecture requete \n");exit(1);}else{ return proc;}
-  }else if(priorite == 2 ){
-    if ((longMSG = msgrcv(global_file, &proc, sizeof(processus) - 4, 2, IPC_NOWAIT)) == -1) {
-	  perror("Erreur de lecture requete \n");exit(1);}else{ return proc;}
-  }else if(priorite == 3 ){
-    if ((longMSG = msgrcv(global_file, &proc, sizeof(processus) - 4, 3, IPC_NOWAIT)) == -1) {
-	  perror("Erreur de lecture requete \n");exit(1);}else{ return proc;}
-  }else {
-    if ((longMSG = msgrcv(global_file, &proc, sizeof(processus) - 4, 4, IPC_NOWAIT)) == -1) {
-	  perror("Erreur de lecture requete \n");exit(1);}else{ return proc;}
-  }
+    //printf("Je cherche dans la priorité: %d\n", priorite);
 
+    if ((longMSG = msgrcv(global_file, &proc, sizeof(processus) - 4, priorite, IPC_NOWAIT)) == -1) {
+        //printf("ERROR\n");
+        priorite = priorite +1;
+        repartiteur_want_processus(priorite, proc);
+    }else{ 
+        //printf("GOOD\n");
+        printf("Requete (FM)            [PROCESSUS A EXECUTER     Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid);
+    }
 }
 
 void repartiteur_push_in_file(processus proc){
@@ -40,7 +36,7 @@ processus processeur(processus proc){
         printf("PROCESSEUR          [4] [EXECUTION  %d tics] \n", quantum);
                 
         for(i; i<=quantum; i++){
-            sleep(timeSYSTEME);
+            sleep(1);
         }
         printf("PROCESSEUR          [4] [Terminé pour le moment] \n");
         printf("PROCESSEUR          [4] [PRIORITÉ -1] \n");
@@ -55,8 +51,9 @@ processus processeur(processus proc){
 
         printf("PROCESSEUR          [4] [EXECUTION  %d tics] \n", proc.tempsExecution);
         for(i; i<=proc.tempsExecution; i++){
-            sleep(timeSYSTEME);
+            sleep(1);
         }
+        
         printf("PROCESSEUR          [4] [Terminé] \n");
         printf("**********          [3] [Fin] \n\n");
 

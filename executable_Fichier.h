@@ -1,6 +1,4 @@
 int* lectureTableCPU(){
-
-    FILE* fichier = NULL;
     int* tableCPU;
     int caractereActuel = 0;
     int i = 0;
@@ -35,5 +33,23 @@ int* lectureTableCPU(){
     }
 
     return tableCPU;
+
+}
+
+
+
+void ecritureProcessusGeneres(FILE* fichier, long priorite, int tempsExecution, int dateSoumission, int pid){
+    
+    fichier = fopen("./processusGeneres.txt", "a+");
+    
+    
+    if (fichier != NULL)
+    {   
+        fseek(fichier,0, SEEK_END);
+        fprintf(fichier, "[2] new processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n",priorite, tempsExecution, dateSoumission, pid );
+        fflush(fichier);
+        fclose(fichier);
+
+    }
 
 }

@@ -3,6 +3,7 @@
         "executable_createprocessus.h": "c",
         "msg.h": "c",
         "executable_moteur.h": "c",
-        "ipc.h": "c"
+        "ipc.h": "c",
+        "semaphore.h": "c"
     }
 }
