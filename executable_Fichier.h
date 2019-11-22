@@ -42,14 +42,14 @@ void ecritureProcessusGeneres(FILE* fichier, long priorite, int tempsExecution, 
     
     fichier = fopen("./processusGeneres.txt", "a+");
     
+
     
     if (fichier != NULL)
     {   
         fseek(fichier,0, SEEK_END);
-        fprintf(fichier, "[2] new processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n",priorite, tempsExecution, dateSoumission, pid );
+        fprintf(fichier, "New processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n",priorite, tempsExecution, dateSoumission, pid );
         fflush(fichier);
         fclose(fichier);
-
     }
 
 }
