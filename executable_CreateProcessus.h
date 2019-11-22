@@ -6,7 +6,8 @@ void createProcessus(int nombreProcessus){
 
     }else{
         nombreProcessus--;
-        long priorite = (long) (rand()%4)+1;
+        
+        long priorite = (long) (rand()%10)+1;
         int tempsExecution = (rand()%6)+1;
         int dateSoumission = timer; 
 

@@ -14,9 +14,7 @@
 int timer = 0;
 int quantum = 0;
 
-int nbTIC = 3;
-
-
+int nbTIC = 6;
 
 int global_file;
 int stream_file;
@@ -40,6 +38,7 @@ FILE* fichier = NULL;
 #include "executable_CreateProcessus.h"
 #include "executable_PROCESSEUR_REPARTITEUR.h"
 
+//INITIALISATION SEMAPHORES 
 int initsem(key_t semkey) 
 {
 	int status = 0;		
@@ -93,7 +92,7 @@ void recursivite_processeur(int* tableCPU, int quantum, int temps_a_consommer){
 
     long priorite;
 
-    printf("[3] Quantum: %d (Table d’allocation CPU => Processus de priorité: %d) \n", quantum, tableCPU[quantum]);
+    printf("\n[3] Quantum: %d (Table d’allocation CPU => Processus de priorité: %d) \n", quantum, tableCPU[quantum]);
     
     priorite = repartiteur_want_processus(tableCPU[quantum], proc1);
     proc2 = repartiteur_msgrcv_processus(priorite, proc2);
@@ -102,7 +101,6 @@ void recursivite_processeur(int* tableCPU, int quantum, int temps_a_consommer){
     proc2 = processeur(proc2, temps_a_consommer);
 
     if (proc2.priorite != -1){
-        // processus sup a 3
         printf("[PROCESSUS A CHANGE      [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n\n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
         V(0); //Je libere le GENERATEUR
         P(1); // Je ME bloque
@@ -110,16 +108,13 @@ void recursivite_processeur(int* tableCPU, int quantum, int temps_a_consommer){
         repartiteur_push_in_file(proc2);
 
     }else {
-        // processus =3 / =2 / =1
         if (proc2.tempsExecution != 0 ){
-            printf("il me reste %d tic a utiliser\n", proc2.tempsExecution );
             recursivite_processeur(tableCPU, quantum, proc2.tempsExecution );
         }else {
             V(0); //Je libere le GENERATEUR
             P(1); // Je ME bloque
         }
     }
-
 }
 
 
@@ -142,7 +137,7 @@ int main(int argc, char *argv[])
 
         printf("[2] GÉNÉRATEUR DE PROCESSUS: En marche.\n");
         printf("[3] RÉPARTITEUR DE PROCESSUS: En marche (Vitesse en fonction du temps d'execution des processus par le processeur).\n");
-        printf("[4] PROCESSEUR: En marche (1 QUANTUM = 3 tics).\n\n");
+        printf("[4] PROCESSEUR: En marche (1 QUANTUM = %d tics).\n\n", nbTIC);
 
         while(1){
 
@@ -165,13 +160,12 @@ int main(int argc, char *argv[])
 
             sleep(1);
 
-
             timer++;
             quantum++;
 
             V(1); // Je libère PROCESSEUR
             P(0); // Je me bloque
-            
+
         }
 
     }else {
@@ -182,8 +176,6 @@ int main(int argc, char *argv[])
             
             while(1){
 
-                
-
                 if(timer == 0){
                     P(1); // Je ME bloque
                 }
@@ -192,7 +184,7 @@ int main(int argc, char *argv[])
                     quantum = 0;
                 }
 
-                printf("\n\nPROCESSEUR                    * QUANTUM: %d -- Timer: %d *\n",quantum, timer);
+                printf("\n\n\n\nPROCESSEUR                    * QUANTUM: %d -- Timer: %d *\n",quantum, timer);
              
                 recursivite_processeur(tableCPU, quantum, nbTIC);
 
@@ -209,6 +201,7 @@ int main(int argc, char *argv[])
 
     free(tableCPU);
     semctl(sem_id, 0, IPC_RMID);
+    semctl(sem_id, 1, IPC_RMID);
 
     return EXIT_SUCCESS;
 }

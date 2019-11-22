@@ -37,12 +37,9 @@ int* lectureTableCPU(){
 }
 
 
-
 void ecritureProcessusGeneres(FILE* fichier, long priorite, int tempsExecution, int dateSoumission, int pid){
     
     fichier = fopen("./processusGeneres.txt", "a+");
-    
-
     
     if (fichier != NULL)
     {   

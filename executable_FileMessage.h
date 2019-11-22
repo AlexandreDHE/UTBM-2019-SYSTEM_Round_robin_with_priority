@@ -1,5 +1,6 @@
 void createFileMessage(){
 
+    // FILE DE MESSAGE GLOBALE 
     if ((global_file = msgget(CLEF_global_file, 0750 | IPC_CREAT | IPC_EXCL)) == -1) {
         perror("Erreur de creation de la file fileMSG_0 \n");
         exit(1);
@@ -7,7 +8,7 @@ void createFileMessage(){
         printf("\n[1] FILE DE MESSAGE: Créée avec succès.\n");
     }
 
-
+    // STREAM FILE 
     if ((stream_file = msgget(CLEF_stream_file, 0750 | IPC_CREAT | IPC_EXCL)) == -1) {
         perror("Erreur de creation de la file fileMSG_0 \n");
         exit(1);
