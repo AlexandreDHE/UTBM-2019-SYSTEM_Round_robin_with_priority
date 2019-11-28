@@ -36,6 +36,46 @@ int* lectureTableCPU(){
 
 }
 
+long* jeu_de_test(){
+
+    long* tableau;
+    int caractereActuel = 0;
+    int i = 0;
+    int j = 1;
+    char chaine[3];
+
+    fichier = fopen("jeu_de_test.txt", "r");
+ 
+    if (fichier != NULL)
+    {
+        // Boucle de lecture des caractères un à un
+        do
+        {   
+            caractereActuel = fgetc(fichier); 
+
+            if(caractereActuel == ':'){
+                if(i == 35){
+                    fscanf(fichier, "%d", &caractereActuel);
+                    tableau = malloc(1+4*caractereActuel*sizeof(long));
+                }else{
+                    fscanf(fichier, "%d", &caractereActuel);
+                    tableau[j] = caractereActuel;
+                    j++;
+                }
+            }
+
+            i++;
+
+        } while (caractereActuel != EOF); 
+ 
+        fclose(fichier);
+        tableau[0] = j;
+
+    }
+
+    return tableau;
+
+}
 
 void ecritureProcessusGeneres(FILE* fichier, long priorite, int tempsExecution, int dateSoumission, int pid){
     

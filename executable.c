@@ -14,7 +14,7 @@
 int timer = 0;
 int quantum = 0;
 
-int nbTIC = 6;
+int nbTIC = 6 ;
 
 int global_file;
 int stream_file;
@@ -32,8 +32,8 @@ FILE* fichier = NULL;
 #define CLEF_global_file 0x00000000
 #define CLEF_stream_file 0x00000001
 
-#include "executable_Fichier.h"
 #include "executable_StructProcessus.h"
+#include "executable_Fichier.h"
 #include "executable_FileMessage.h"
 #include "executable_CreateProcessus.h"
 #include "executable_PROCESSEUR_REPARTITEUR.h"
@@ -123,11 +123,37 @@ int main(int argc, char *argv[])
 
     printf("*********************************************************************\n");
     printf("* Simulation de ROUND ROBIN AVEC PRIORITÉ - [PID:%d - PPID:%d] *\n", getpid(), getppid() );
-    printf("*********************************************************************\n");
+    printf("*********************************************************************\n\n");
+
+    char nom[1]= {0};
+    int choix;
+
+  
+ 
+    printf("Choisissez votre mode: \n [1] Génération Automatique\n [2] Generation a partir du fichier 'Jeu_de_test.text'\n\n ");
+    scanf("%s", nom);
+    choix = (int) strtol(nom, (char **)NULL, 10);
+    printf("choix: %d\n", choix);
 
     int* tableCPU = lectureTableCPU();
-    int resFork;
+    int resFork; 
+    int i;
+    int j=0;
 
+    long* tableau = jeu_de_test();
+    //printf("taille tableau: %ld\n", tableau[0]);
+    
+    for(i=1; i<tableau[0]; i++){
+        j++;
+        printf(" %ld . ",(long)tableau[i]);
+        if(j == 4){
+            j=0;
+            printf("\n");
+        }
+    }   
+        
+    
+    
     if((sem_id = initsem(SKEY)) < 0) return(1);
 
     //CREATION DE LA FILE DE MESSAGE
@@ -151,8 +177,16 @@ int main(int argc, char *argv[])
             printf("\nGENERATEUR                    * QUANTUM: %d -- Timer: %d *\n",quantum, timer);
 
             if((resFork = fork()) == 0 ){
-                int nombreProcessus = rand()%(4 +1);
-                createProcessus(nombreProcessus);
+                if (choix == 1 ){
+                    int nombreProcessus = rand()%(4 +1);
+                    createProcessus(nombreProcessus);
+                }else {
+                   
+                }
+                        
+            
+               
+                
 
             }else{
                 while(1){sleep(10);};

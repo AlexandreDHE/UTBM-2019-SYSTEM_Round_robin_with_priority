@@ -4,6 +4,7 @@
         "msg.h": "c",
         "executable_moteur.h": "c",
         "ipc.h": "c",
-        "semaphore.h": "c"
+        "semaphore.h": "c",
+        "executable_fichier.h": "c"
     }
 }
