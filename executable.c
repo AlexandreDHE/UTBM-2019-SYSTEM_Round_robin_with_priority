@@ -235,16 +235,7 @@ int main(int argc, char *argv[])
 
         }else{
             while(1){
-                /*do{
-                    scanf("%s", val);
-                }while(val[0] != 'q' );
-                printf(" EXIT\n");
-                free(tableCPU);
-                semctl(sem_id, 0, IPC_RMID);
-                semctl(sem_id, 1, IPC_RMID);
-
-                msgctl(global_file, IPC_RMID, NULL);
-                msgctl(stream_file, IPC_RMID, NULL);*/
+                sleep(10);
             }
    
         }
