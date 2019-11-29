@@ -13,6 +13,7 @@
 
 int timer = 0; // Quantum en cours 
 int quantum = 0; // Valeur du quantum dans la table CPU
+int vitesse = 1;
 
 int periode = 1 ; // La periode de remise en question du processus à executer 
 
@@ -125,14 +126,18 @@ int main(int argc, char *argv[])
 
     char val[1]= {0}; // Variable pour la saisie
   
-    printf("Choisissez votre mode: \n [1] Génération Automatique\n [2] Generation a partir du fichier 'Jeu_de_test.text'\nChoix:  ");
+    printf("Choisissez votre mode: \n [1] Génération Automatique\n [2] Generation a partir du fichier 'Jeu_de_test.text'\n\nChoix:  ");
     scanf("%s", val);
     int choix;
     choix = (int) strtol(val, (char **)NULL, 10);
     
-    printf("Choisissez la valeur du quantum: ");
+    printf("\nChoisissez la valeur du quantum: ");
     scanf("%s", val);
     periode = (int) strtol(val, (char **)NULL, 10);
+
+    printf("\nChoisissez la vitesse d'execution: ");
+    scanf("%s", val);
+    vitesse = (int) strtol(val, (char **)NULL, 10);
 
     // Initialisation de la table CPU dans le systeme
     int* tableCPU = lectureTableCPU();
@@ -158,7 +163,7 @@ int main(int argc, char *argv[])
 
             printf("\n-------------------------------------------------------------------------------------------------------------------------------------\n\n");
 
-            if(quantum == 11){ 
+            if(quantum == 56){  /*************** *****************/  
                 quantum = 0;
             }
 
@@ -184,7 +189,7 @@ int main(int argc, char *argv[])
                     sleep(10);};
             }
 
-            sleep(1);
+            sleep(vitesse);
 
             timer++; // On passe au quantum suivant 
             quantum++; // on passe au quantum suivant dans la table CPU 
@@ -207,7 +212,7 @@ int main(int argc, char *argv[])
                     P(1); // Le processeur commence par se bloquer pour laisser place a la création des premiers processus (Generateur)
                 }
 
-                if(quantum == 11){
+                if(quantum == 56){ /********************************** ALERTE ************/
                     quantum = 0;
                 }
 
@@ -222,7 +227,7 @@ int main(int argc, char *argv[])
                 }
                 
 
-                sleep(1);
+                sleep(vitesse);
                 timer++; // On passe au quantum suivant 
                 quantum++; // on passe au quantum suivant dans la table CPU 
 

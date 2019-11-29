@@ -3,8 +3,14 @@ long repartiteur_want_processus(int priorite, processus proc1){
     int longMSG;
 
     if ((longMSG = msgrcv(global_file, &proc1, sizeof(processus) - 4, priorite, IPC_NOWAIT)) == -1) {
-        priorite = priorite +1;
-        repartiteur_want_processus(priorite, proc1);
+        
+        if(priorite == 10){
+            repartiteur_want_processus(1, proc1);
+        }else {
+            priorite = priorite +1;
+            repartiteur_want_processus(priorite, proc1);
+        }
+        
     }else{ 
         pushInStreamFile(proc1);
         return proc1.priorite;
@@ -40,13 +46,13 @@ processus processeur(processus proc, int temps_restant){
 
     if((proc.tempsExecution - temps_restant) > 0 ){
 
-        if(proc.priorite != 4){
+        if(proc.priorite != 10){
             proc.priorite = proc.priorite+1 ;
         }
 
         proc.tempsExecution = proc.tempsExecution-temps_restant;
         
-        printf("[4] [EXECUTION  %d tics] \n", temps_restant);
+        printf("[4] [EXECUTION  %d] \n", temps_restant);
         printf("[4] [Terminé pour le moment] \n");
         printf("[4] [PRIORITÉ -1] \n");
 
@@ -54,7 +60,7 @@ processus processeur(processus proc, int temps_restant){
 
     }else{
 
-        printf("[4] [EXECUTION  %d tics] \n", proc.tempsExecution);     
+        printf("[4] [EXECUTION  %d] \n", proc.tempsExecution);     
         printf("[4] [Terminé] \n");
         printf("[4] [Fin] \n\n");
 
@@ -63,7 +69,7 @@ processus processeur(processus proc, int temps_restant){
         proc.dateSoumission = -1;
         proc.tempsExecution = temps_restant - proc.tempsExecution;
 
-        printf("\nNombre de tic(s) restant: %d\n\n", proc.tempsExecution);
+        printf("\nNombre de Quantums restant: %d\n\n", proc.tempsExecution);
 
         return proc;
     }

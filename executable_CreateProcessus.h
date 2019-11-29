@@ -9,7 +9,7 @@ void createProcessus(int nombreProcessus, long dateArrive, int priorite, int tem
         proc.dateSoumission = dateArrive ; 
         proc.pid = pid;
         
-        printf("                              [2] new processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid );
+        printf("                              [2] new processus ( Priorité = %ld       TempsExec = %d Q      DateSoumission = %d)      [PID: %d]\n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid );
 
         pushInFile(proc);
         ecritureProcessusGeneres(fichier, proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid);
@@ -34,7 +34,7 @@ void createProcessus(int nombreProcessus, long dateArrive, int priorite, int tem
                 proc.dateSoumission = dateSoumission ; 
                 proc.pid = getpid();
 
-                printf("                              [2] new processus ( Priorité = %ld       TempsExec = %d TIC       DateSoumission = %d)      [PID: %d]\n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid );
+                printf("                              [2] new processus ( Priorité = %ld       TempsExec = %d Q       DateSoumission = %d)      [PID: %d]\n", proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid );
 
                 pushInFile(proc);
                 ecritureProcessusGeneres(fichier, proc.priorite, proc.tempsExecution, proc.dateSoumission, proc.pid);
