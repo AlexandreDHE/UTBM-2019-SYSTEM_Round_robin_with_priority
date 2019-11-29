@@ -40,7 +40,7 @@ processus processeur(processus proc, int temps_restant){
 
     if((proc.tempsExecution - temps_restant) > 0 ){
 
-        if(proc.priorite != 10){
+        if(proc.priorite != 4){
             proc.priorite = proc.priorite+1 ;
         }
 

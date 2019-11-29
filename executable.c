@@ -11,12 +11,12 @@
 #include <fcntl.h>
 #include <sys/sem.h>
 
-int timer = 0;
-int quantum = 0;
+int timer = 0; // Quantum en cours 
+int quantum = 0; // Valeur du quantum dans la table CPU
 
-int nbTIC = 6 ;
+int periode = 1 ; // La periode de remise en question du processus à executer 
 
-int global_file;
+int global_file; // File de message globale (File d'attente des processus)
 int stream_file;
 
 #define IFLAGS (SEMPERM | IPC_CREAT)
@@ -87,33 +87,31 @@ int V(int semnum) {
 
 void recursivite_processeur(int* tableCPU, int quantum, int temps_a_consommer){
 
-    processus proc1;
-    processus proc2;
+    processus proc1; // Creation d'une structure de processus pour 
+    processus proc2; // Creation d'une structure de processus pour recuperer la structure du processus à executer
 
-    long priorite;
+    long priorite; 
 
     printf("\n[3] Quantum: %d (Table d’allocation CPU => Processus de priorité: %d) \n", quantum, tableCPU[quantum]);
     
-    priorite = repartiteur_want_processus(tableCPU[quantum], proc1);
-    proc2 = repartiteur_msgrcv_processus(priorite, proc2);
+    priorite = repartiteur_want_processus(tableCPU[quantum], proc1); // Le repartiteur pousse dans filestream le bon processus à executer suivant la table CPU
+    proc2 = repartiteur_msgrcv_processus(priorite, proc2); // Le repartiteur recupère dans filestream le processus devant etre executer
     printf("PROCESSUS A EXECUTER     [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
     
-    proc2 = processeur(proc2, temps_a_consommer);
+    proc2 = processeur(proc2, temps_a_consommer); // Execution du processus par le processeur
 
-    if (proc2.priorite != -1){
+    if (proc2.priorite != -1){ // Si le temps d'execution n'est pas terminé, on renvoie dans la file de message le processus apres un le prochain quantum
         printf("[PROCESSUS A CHANGE      [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n\n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
-        V(0); //Je libere le GENERATEUR
-        P(1); // Je ME bloque
+        V(0); //Libération du generateur pour création de nouveaux processus
+        P(1); //Blocage du processeur
         
-        repartiteur_push_in_file(proc2);
+        repartiteur_push_in_file(proc2); // Envoie du processus dans la file apres l'arrivée des nouveaux processus
 
     }else {
-        if (proc2.tempsExecution != 0 ){
-            recursivite_processeur(tableCPU, quantum, proc2.tempsExecution );
-        }else {
-            V(0); //Je libere le GENERATEUR
-            P(1); // Je ME bloque
-        }
+
+        printf("JE NE FAIT RIEN \n");
+        V(0); //Libération du generateur pour création de nouveaux processus
+        P(1); //Blocage du processeur
     }
 }
 
@@ -125,83 +123,78 @@ int main(int argc, char *argv[])
     printf("* Simulation de ROUND ROBIN AVEC PRIORITÉ - [PID:%d - PPID:%d] *\n", getpid(), getppid() );
     printf("*********************************************************************\n\n");
 
-    char nom[1]= {0};
-    int choix;
-
+    char val[1]= {0}; // Variable pour la saisie
   
- 
-    printf("Choisissez votre mode: \n [1] Génération Automatique\n [2] Generation a partir du fichier 'Jeu_de_test.text'\n\n ");
-    scanf("%s", nom);
-    choix = (int) strtol(nom, (char **)NULL, 10);
-    printf("choix: %d\n", choix);
+    printf("Choisissez votre mode: \n [1] Génération Automatique\n [2] Generation a partir du fichier 'Jeu_de_test.text'\nChoix:  ");
+    scanf("%s", val);
+    int choix;
+    choix = (int) strtol(val, (char **)NULL, 10);
+    
+    printf("Choisissez la valeur du quantum: ");
+    scanf("%s", val);
+    periode = (int) strtol(val, (char **)NULL, 10);
 
+    // Initialisation de la table CPU dans le systeme
     int* tableCPU = lectureTableCPU();
-    int resFork; 
-    int i;
-    int j=0;
-
+   
     long* tableau = jeu_de_test();
-    //printf("taille tableau: %ld\n", tableau[0]);
-    
-    for(i=1; i<tableau[0]; i++){
-        j++;
-        printf(" %ld . ",(long)tableau[i]);
-        if(j == 4){
-            j=0;
-            printf("\n");
-        }
-    }   
-        
-    
-    
+    int n=0; // Toutes les 4 valeurs du tableau de processus a executer (Date arrivée)
+
+    // Initialisation des semaphores
     if((sem_id = initsem(SKEY)) < 0) return(1);
 
     //CREATION DE LA FILE DE MESSAGE
     createFileMessage();
 
+    int resFork; 
+    // GENERATEUR DE PROCESSUS // 
     if((resFork = fork()) == 0 ){
 
         printf("[2] GÉNÉRATEUR DE PROCESSUS: En marche.\n");
         printf("[3] RÉPARTITEUR DE PROCESSUS: En marche (Vitesse en fonction du temps d'execution des processus par le processeur).\n");
-        printf("[4] PROCESSEUR: En marche (1 QUANTUM = %d tics).\n\n", nbTIC);
+        printf("[4] PROCESSEUR: En marche (Processeur s'execute tous les %d QUANTUMS).\n\n", periode);
 
         while(1){
 
             printf("\n-------------------------------------------------------------------------------------------------------------------------------------\n\n");
 
-
-            if(quantum == 11){
+            if(quantum == 11){ 
                 quantum = 0;
             }
 
             printf("\nGENERATEUR                    * QUANTUM: %d -- Timer: %d *\n",quantum, timer);
 
             if((resFork = fork()) == 0 ){
-                if (choix == 1 ){
-                    int nombreProcessus = rand()%(4 +1);
-                    createProcessus(nombreProcessus);
-                }else {
-                   
-                }
-                        
-            
-               
-                
 
+                if (choix == 1 ){ // Génerateur automatique des processus
+                    int nombreProcessus = rand()%(4 +1);
+                    createProcessus(nombreProcessus, -1 , -1 , -1 , -1);
+                }//else if(choix == 2) { // Generateur par lecture simple du fichier de creation
+
+                    for(int i=1; i<tableau[0]; i++){
+                        if(tableau[n*4+1] == quantum){ // Si la date de soumission du processus (toutes les 4 valeurs du tableau) = quantum actuel alors creer le processus            
+                            createProcessus(-1, (long)tableau[n*4+1] , (int)tableau[n*4+2] ,(int)tableau[n*4+3] , (int)tableau[n*4+4]);
+                            n++;
+                        }
+                    }  
+                //}
+                        
             }else{
-                while(1){sleep(10);};
+                while(1){
+                    sleep(10);};
             }
 
             sleep(1);
 
-            timer++;
-            quantum++;
+            timer++; // On passe au quantum suivant 
+            quantum++; // on passe au quantum suivant dans la table CPU 
 
-            V(1); // Je libère PROCESSEUR
-            P(0); // Je me bloque
+            V(1); // Le générateur libère PROCESSEUR
+            P(0); // Le générateur se bloque
 
         }
 
+    // REPARTITEUR ET GENERATEUR // 
     }else {
 
         if((resFork = fork()) == 0 ){
@@ -211,7 +204,7 @@ int main(int argc, char *argv[])
             while(1){
 
                 if(timer == 0){
-                    P(1); // Je ME bloque
+                    P(1); // Le processeur commence par se bloquer pour laisser place a la création des premiers processus (Generateur)
                 }
 
                 if(quantum == 11){
@@ -220,22 +213,37 @@ int main(int argc, char *argv[])
 
                 printf("\n\n\n\nPROCESSEUR                    * QUANTUM: %d -- Timer: %d *\n",quantum, timer);
              
-                recursivite_processeur(tableCPU, quantum, nbTIC);
+             
+                if(timer%periode == 0){
+                    recursivite_processeur(tableCPU, quantum, periode);
+                }else {
+                    V(0); //Libération du generateur pour création de nouveaux processus
+                    P(1); //Blocage du processeur
+                }
+                
 
                 sleep(1);
-                quantum++;
-                timer++;
+                timer++; // On passe au quantum suivant 
+                quantum++; // on passe au quantum suivant dans la table CPU 
 
             }
 
         }else{
-            while(1){sleep(10);}
+            while(1){
+                /*do{
+                    scanf("%s", val);
+                }while(val[0] != 'q' );
+                printf(" EXIT\n");
+                free(tableCPU);
+                semctl(sem_id, 0, IPC_RMID);
+                semctl(sem_id, 1, IPC_RMID);
+
+                msgctl(global_file, IPC_RMID, NULL);
+                msgctl(stream_file, IPC_RMID, NULL);*/
+            }
+   
         }
     }
-
-    free(tableCPU);
-    semctl(sem_id, 0, IPC_RMID);
-    semctl(sem_id, 1, IPC_RMID);
 
     return EXIT_SUCCESS;
 }
