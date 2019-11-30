@@ -95,25 +95,34 @@ void recursivite_processeur(int* tableCPU, int quantum, int temps_a_consommer){
 
     printf("\n[3] Quantum: %d (Table d’allocation CPU => Processus de priorité: %d) \n", quantum, tableCPU[quantum]);
     
-    priorite = repartiteur_want_processus(tableCPU[quantum], proc1); // Le repartiteur pousse dans filestream le bon processus à executer suivant la table CPU
-    proc2 = repartiteur_msgrcv_processus(priorite, proc2); // Le repartiteur recupère dans filestream le processus devant etre executer
-    printf("PROCESSUS A EXECUTER     [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
+    priorite = repartiteur_want_processus(tableCPU[quantum], proc1, 0); // Le repartiteur pousse dans filestream le bon processus à executer suivant la table CPU
     
-    proc2 = processeur(proc2, temps_a_consommer); // Execution du processus par le processeur
-
-    if (proc2.priorite != -1){ // Si le temps d'execution n'est pas terminé, on renvoie dans la file de message le processus apres un le prochain quantum
-        printf("[PROCESSUS A CHANGE      [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n\n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
+    
+    if(priorite == 999){
         V(0); //Libération du generateur pour création de nouveaux processus
         P(1); //Blocage du processeur
-        
-        repartiteur_push_in_file(proc2); // Envoie du processus dans la file apres l'arrivée des nouveaux processus
-
     }else {
+        proc2 = repartiteur_msgrcv_processus(priorite, proc2); // Le repartiteur recupère dans filestream le processus devant etre executer
+        printf("PROCESSUS A EXECUTER     [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
+    
+        proc2 = processeur(proc2, temps_a_consommer); // Execution du processus par le processeur
 
-        printf("JE NE FAIT RIEN \n");
-        V(0); //Libération du generateur pour création de nouveaux processus
-        P(1); //Blocage du processeur
+        if (proc2.priorite != -1){ // Si le temps d'execution n'est pas terminé, on renvoie dans la file de message le processus apres un le prochain quantum
+            printf("[PROCESSUS A CHANGE      [ Priorité = %ld       TempsExec = %d       DateSoumission = %d       PID: %d ] \n\n", proc2.priorite, proc2.tempsExecution, proc2.dateSoumission, proc2.pid);
+            V(0); //Libération du generateur pour création de nouveaux processus
+            P(1); //Blocage du processeur
+            
+            repartiteur_push_in_file(proc2); // Envoie du processus dans la file apres l'arrivée des nouveaux processus
+
+        }else {
+
+            printf("JE NE FAIT RIEN \n");
+            V(0); //Libération du generateur pour création de nouveaux processus
+            P(1); //Blocage du processeur
+        }
     }
+    
+    
 }
 
 

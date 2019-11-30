@@ -1,14 +1,24 @@
-long repartiteur_want_processus(int priorite, processus proc1){
+long repartiteur_want_processus(int priorite, processus proc1, int nbTour){
 
     int longMSG;
+
+    if(nbTour == 10){
+        printf("quantum suivant");
+        return 999;
+    }
 
     if ((longMSG = msgrcv(global_file, &proc1, sizeof(processus) - 4, priorite, IPC_NOWAIT)) == -1) {
         
         if(priorite == 10){
-            repartiteur_want_processus(1, proc1);
+            nbTour++;
+            printf("tour Actuel: %d\n", nbTour);
+            repartiteur_want_processus(1, proc1, nbTour );
+
         }else {
             priorite = priorite +1;
-            repartiteur_want_processus(priorite, proc1);
+            nbTour++;
+            printf("tour Actuel: %d\n", nbTour);
+            repartiteur_want_processus(priorite, proc1, nbTour);
         }
         
     }else{ 
