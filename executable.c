@@ -10,6 +10,12 @@
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/sem.h>
+#include <signal.h>
+
+static volatile int keeprunning = 0;
+void intHandler(int dummy){
+    keeprunning = 1;
+}
 
 int timer = 0; // Quantum en cours 
 int quantum = 0; // Valeur du quantum dans la table CPU
@@ -144,10 +150,6 @@ int main(int argc, char *argv[])
     scanf("%s", val);
     periode = (int) strtol(val, (char **)NULL, 10);
 
-    printf("\nChoisissez la vitesse d'execution: ");
-    scanf("%s", val);
-    vitesse = (int) strtol(val, (char **)NULL, 10);
-
     // Initialisation de la table CPU dans le systeme
     int* tableCPU = lectureTableCPU();
    
@@ -244,7 +246,14 @@ int main(int argc, char *argv[])
 
         }else{
             while(1){
-                sleep(10);
+                signal(SIGINT, intHandler); 
+                if(keeprunning == 1){
+                    msgctl(global_file, IPC_RMID, 0);
+                    msgctl(stream_file, IPC_RMID, 0);
+                    semctl(sem_id, IPC_RMID, 0);
+                    exit(0);
+
+                }
             }
    
         }
